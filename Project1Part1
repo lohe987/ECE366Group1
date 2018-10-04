@@ -1,0 +1,43 @@
+#Steven Mac
+#ECE 366
+#Project 1 
+#Program 1: 6^P mod 17
+
+.data
+P: .word 11
+R: .word -1
+
+.text
+addi $t0,$0,1                   # For multiplying the exponential value
+lw $t1, P                        # Exponential value
+
+exponential1:
+    or $t3,$0,$t0
+    beq $t1,$zero,modulus       # Jumps to modulus once $t3^$t1 is finished
+    subi $t1,$t1,1              # increments the loop by decreasing $t1 by 1
+    sll $t0,$t3,2             # $t3 = (6)^P
+    addu $t0,$t3,$t0
+    addu $t0,$t3,$t0
+j exponential1
+   
+    
+modulus:
+                                # Now we are doing $t3 mod 17
+    subi $t3,$t3, 17            # Keeps subtracting 
+    slt $t4,$t3,$zero           # until it is less than zero
+    bne $t4,$zero, modulus2     # Once less than zero we go to part 2
+
+j modulus
+
+modulus2:
+    
+    slt $t5,$t3,$0          # Since modulus is the remainder
+    beq $t5,$0,out
+    addi $t3,$t3,17             # we will add back a 17 to get the desired mod
+    sw $t3, R($0)               # then store it into result variable
+    
+j modulus2
+        
+out:
+    
+    j out
