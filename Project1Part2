@@ -1,0 +1,62 @@
+.data
+
+T: .word 0xABCDEF00
+best_matching_score: .word -1 # best score = ? within [0, 32]
+best_matching_count: .word -1 # how many patterns achieve the best score?
+Pattern_Array: .word 0x1111, 0x2222, 0x3333, 0x4444, 0x5555, 0x6666, 0x8888, 0x9999, 0xAAAA, 0xBBBB, 0xCCCC, 0xDDDD, 0xEEEE, 0xFFFF, 0x1234, 0xFFFFFFFF, 0xABCD2134, 100, 954, 5
+
+.text
+
+addi $t2,$0,0        #Initialize Array incrementer
+addi $t3,$0,21        #Maximum amount of arrays to test to target +1       
+add $s1,$0,$0         #Hold match count with the same best scores
+addi $s3,$s3,32       #Used to invert and function
+
+reset:
+
+   beq $t3,$0,out
+   add $s0,$0,$0                #Resets Match score 
+
+   lw $t0,T($0)                 #Reloads target
+   lw $t1,Pattern_Array($t2)    #Reloads Pattern_Array ($t2)
+   addi $t4, $0, 31            #Counter for bits when srl
+   xor $t5,$t0,$t1              #Checks each bit for match
+   
+matchLoop:
+
+   beq $t4,$0, checkScore
+   subi $t4,$t4,1
+   
+   andi $t6,$t5,1              #Checks xor for matches
+   srl $t5,$t5,1               #Shifts so andi can check for matches in xor
+   add $s0,$s0,$t6             #add 1 to score if andi finds match
+   
+j matchLoop
+
+checkScore:
+
+   subi $t3,$t3,1               #Decrements array count    
+   addi $t2,$t2,4               #Increments the "Pattern_Array"
+   sub $s0, $s3,$s0             #Inverts the andi to give the correct score
+   lw $t7,best_matching_score($0)#Loads the current best score
+   beq $s0,$t7, addMatchCount   #Compare it to the checked Match
+   bgt $s0,$t7, newScore        
+   
+   j reset
+   
+newScore:
+
+   sw $s0,best_matching_score($0)#Stores the highest score
+   and $s1,$s1, $0               #Resets the count
+   addi $s1,$s1,1                
+   sw $s1, best_matching_count($0)#Stores new count
+   
+   j reset
+   
+addMatchCount:
+   addi $s1,$s1,1                 #Add to count if another match has
+   sw $s1, best_matching_count($0)#the same score to the current best
+   j reset
+   
+out:
+j out
