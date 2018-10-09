@@ -1,0 +1,70 @@
+.data
+P: .word 5           # Exponential Value (0x0000)
+Q: .word 10          # Modulus Number    (0x0004)
+R: .word -1          # Store result      (0x0008)
+
+.text
+
+     li $t1, 1
+     sll $t1,$t1,1
+     sll $t1,$t1,1
+     li $t2,1
+     sll $t2,$t2,1
+     add $t1,$t1,$t2    # Reg 1 becomes 6
+     li $t2,0
+     lw $t3, 0($t2)    # Reg 2 holds the exponential value
+     add $t4,$t4,$t1    # Holds 6 incase P =1
+     
+     Expo:
+     add $t2,$t1,$t2
+     sll $t1,$t1,1
+     sll $t1,$t1,1
+     add $t1,$t1,$t2
+     add $t1,$t1,$t2
+     li $t2,1
+     sub $t3,$t3,$t2
+     ble $t3,$t2,checkP1a
+     j Expo
+
+     checkP1a:           #Checks P will reset if P=1
+     li $t2,0             #Otherwise continue to mod1
+     lw $t3,0($t2)         #Reloads Reg 3
+     li $t2,1
+     sub $t3,$t3,$t2
+     beqz $t3, checkP1b
+     j mod1
+     
+     checkP1b:            #Resets Reg 1 to be 6 because P = 1
+     li $t1,0
+     xor $t1,$t4,$t1        # Reg 1 becomes 6
+     j mod1
+     
+     mod1:
+     li $t3,0
+     add $t3, $t3,$t1
+     li $t1,1
+     sll $t1,$t1,1
+     sll $t1,$t1,1
+     lw $t2, 0($t1)
+     li $t1,0
+     j mod2
+     
+     mod2:
+     sub $t3, $t3, $t2
+     ble $t3, $t1, mod3
+     j mod2
+     
+     mod3:
+     beqz $t3,result
+     add $t3,$t3,$t2
+     
+     result:
+     li $t1,1
+     sll $t1,$t1,1
+     sll $t1,$t1,1
+     sll $t1,$t1,1
+     sw $t3,0($t1)
+     j out
+     
+     out:
+     j out
