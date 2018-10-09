@@ -1,6 +1,9 @@
+# Steven Mac
+# Project 2 Assembly Code Program 1
+# Program Function: 6^P % Q
 .data
-P: .word 5           # Exponential Value (0x0000)
-Q: .word 10          # Modulus Number    (0x0004)
+P: .word 5           # P = Exponential Value (0x0000)
+Q: .word 10          # Q = Modulus Number    (0x0004)
 R: .word -1          # Store result      (0x0008)
 
 .text
