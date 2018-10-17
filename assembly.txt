@@ -1,0 +1,12 @@
+lw $2, ($1)
+sw $2, ($2)
+add $1, $2
+sltR0 $0, $1
+bezR0 6
+sub $2, $2
+andi $2, $1
+li $0, 4
+subi $2
+xorR0 $3
+srl $1
+jump $1
